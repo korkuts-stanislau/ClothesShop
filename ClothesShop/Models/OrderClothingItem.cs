@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ClothesShop.Models
 {
-    public class OrdersClothingItems : Entity
+    public class OrderClothingItem : Entity
     {
         public int OrderId { get; set; }
         public Order Order { get; set; }

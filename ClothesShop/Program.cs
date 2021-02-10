@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,9 +13,20 @@ namespace ClothesShop
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            using (var scope = host.Services.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                await Areas.Identity.IdentityInitializer.InitializeAsync(userManager, roleManager);
+
+                //var dbContext = scope.ServiceProvider.GetRequiredService<Data.DiskRentalContext>();
+                //var dbInitializer = scope.ServiceProvider.GetRequiredService<Data.DBInitializer>();
+                //await dbInitializer.Initialize(dbContext);
+            }
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
