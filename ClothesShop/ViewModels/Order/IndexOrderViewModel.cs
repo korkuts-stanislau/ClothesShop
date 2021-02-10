@@ -7,6 +7,7 @@ namespace ClothesShop.ViewModels.Order
 {
     public class IndexOrderViewModel
     {
-        PageViewModel PageViewModel { get; set; }
+        public IEnumerable<Models.Order> Orders { get; set; }
+        public PageViewModel PageViewModel { get; set; }
     }
 }
