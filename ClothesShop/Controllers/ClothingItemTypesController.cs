@@ -7,22 +7,57 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ClothesShop.Data;
 using ClothesShop.Models;
+using ClothesShop.EntityServices;
 
 namespace ClothesShop.Controllers
 {
     public class ClothingItemTypesController : Controller
     {
         private readonly ClothesShopContext _context;
+        private readonly ClothingItemTypeService _service;
+        private readonly int _pageSize;
 
         public ClothingItemTypesController(ClothesShopContext context)
         {
             _context = context;
+            _service = new ClothingItemTypeService();
+            _pageSize = 5;
         }
 
         // GET: ClothingItemTypes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string selectedName, int? page, ClothingItemTypeService.SortState? sortState)
         {
-            return View(await _context.ClothingItemTypes.ToListAsync());
+            if (!User.IsInRole(Areas.Identity.Roles.User) && !User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
+            bool isFromFilter = HttpContext.Request.Query["isFromFilter"] == "true";
+
+            _service.GetSortPagingCookiesForUserIfNull(Request.Cookies, User.Identity.Name, isFromFilter,
+                ref page, ref sortState);
+            _service.GetFilterCookiesForUserIfNull(Request.Cookies, User.Identity.Name, isFromFilter,
+                ref selectedName);
+            _service.SetDefaultValuesIfNull(ref selectedName, ref page, ref sortState);
+            _service.SetCookies(Response.Cookies, User.Identity.Name, selectedName, page, sortState);
+
+            var clothingItemTypes = _context.ClothingItemTypes.AsQueryable();
+
+            clothingItemTypes = _service.Filter(clothingItemTypes, selectedName);
+
+            var count = await clothingItemTypes.CountAsync();
+
+            clothingItemTypes = _service.Sort(clothingItemTypes, (ClothingItemTypeService.SortState)sortState);
+            clothingItemTypes = _service.Paging(clothingItemTypes, isFromFilter, (int)page, _pageSize);
+
+            ViewModels.ClothingItemType.IndexClothingItemTypeViewModel model = new ViewModels.ClothingItemType.IndexClothingItemTypeViewModel
+            {
+                ClothingItemTypes = await clothingItemTypes.ToListAsync(),
+                PageViewModel = new ViewModels.PageViewModel(count, (int)page, _pageSize),
+                FilterClothingItemTypeViewModel = new ViewModels.ClothingItemType.FilterClothingItemTypeViewModel(selectedName),
+                SortClothingItemTypeViewModel = new ViewModels.ClothingItemType.SortClothingItemTypeViewModel((ClothingItemTypeService.SortState)sortState),
+            };
+
+            return View(model);
         }
 
         // GET: ClothingItemTypes/Details/5

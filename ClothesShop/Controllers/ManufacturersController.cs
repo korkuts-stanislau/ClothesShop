@@ -58,7 +58,6 @@ namespace ClothesShop.Controllers
             };
 
             return View(model);
-            return View(await _context.Manufacturers.ToListAsync());
         }
 
         // GET: Manufacturers/Details/5
