@@ -3,7 +3,7 @@
 @{ ViewData["Title"] = "Index";
     var defaultBasketItem = Model.BasketItems.FirstOrDefault(); }
 
-<h1>Index</h1>
+
 
 <form method="get" class="form-inline">
     <label>BasketItem name:</label>
@@ -15,9 +15,6 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => defaultBasketItem.UserId)
-            </th>
             <th>
                 <a asp-action="Index"
                    asp-route-sortState="@Model.SortBasketItemViewModel.NameSort"
@@ -36,10 +33,7 @@
         {
 <tr>
     <td>
-        @Html.DisplayFor(modelItem => item.UserId)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.ClothingItem.Id)
+        @Html.DisplayFor(modelItem => item.ClothingItem.Name)
     </td>
     <td>
         @Html.DisplayFor(modelItem => item.Count)

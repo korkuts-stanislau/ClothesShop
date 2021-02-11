@@ -8,17 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using ClothesShop.Data;
 using ClothesShop.Models;
 using ClothesShop.EntityServices;
+using Microsoft.AspNetCore.Identity;
 
 namespace ClothesShop.Controllers
 {
     public class BasketItemsController : Controller
     {
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly ClothesShopContext _context;
         private readonly BasketItemService _service;
         private readonly int _pageSize;
 
-        public BasketItemsController(ClothesShopContext context)
+        public BasketItemsController(ClothesShopContext context, UserManager<IdentityUser> userManager)
         {
+            _userManager = userManager;
             _context = context;
             _service = new BasketItemService();
             _pageSize = 8;
@@ -47,6 +50,12 @@ namespace ClothesShop.Controllers
             var basketItems = _context.BasketItems
                 .Include(b => b.ClothingItem)
                 .AsQueryable();
+
+            if (User.IsInRole(Areas.Identity.Roles.User))
+            {
+                basketItems = basketItems
+                    .Where(b => b.UserId.Equals(_userManager.GetUserId(User)));
+            }
 
             basketItems = _service.Filter(basketItems, selectedName);
 

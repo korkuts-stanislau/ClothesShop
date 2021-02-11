@@ -3,12 +3,12 @@
 @{ ViewData["Title"] = "Index";
     var defaultClothingItem = Model.ClothingItems.FirstOrDefault(); }
 
-<h1>Index</h1>
+
 
 @if (User.IsInRole(ClothesShop.Areas.Identity.Roles.Admin))
 {
     <p>
-        <a asp-action="Create">Create New</a>
+        <a asp-action="Create"  class="btn btn-outline-dark m-1">Create</a>
     </p>}
 <form method="get" class="form-inline">
     <label>Clothing item name:</label>
@@ -53,10 +53,10 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Type.Id)
+                    @Html.DisplayFor(modelItem => item.Type.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Manufacturer.Id)
+                    @Html.DisplayFor(modelItem => item.Manufacturer.Name)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
@@ -77,6 +77,7 @@
                     @if (User.IsInRole(ClothesShop.Areas.Identity.Roles.User))
                     {
                         <form asp-action="AddToBasket">
+                            <input type="number" name="count" min="1"/>
                             <input type="hidden" name="id" asp-for="@item.Id" />
                             <input type="submit" value="Buy" class="btn btn-outline-dark m-1"/>
                         </form>

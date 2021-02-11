@@ -3,10 +3,10 @@
 @{ ViewData["Title"] = "Index";
     var defaultManufacturer = Model.Manufacturers.FirstOrDefault(); }
 
-<h1>Index</h1>
+
 
 <p>
-    <a asp-action="Create">CREATE NEW</a>
+    <a asp-action="Create"  class="btn btn-outline-dark m-1">Create</a>
 </p>
 <form method="get" class="form-inline">
     <label>Manufacturer name:</label>

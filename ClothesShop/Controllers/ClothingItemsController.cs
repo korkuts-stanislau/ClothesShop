@@ -228,7 +228,7 @@ namespace ClothesShop.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddToBasket(int id)
+        public async Task<IActionResult> AddToBasket(int id, int? count)
         {
             if (!User.IsInRole(Areas.Identity.Roles.User))
             {
@@ -238,7 +238,7 @@ namespace ClothesShop.Controllers
             {
                 UserId = _userManager.GetUserId(User),
                 ClothingItemId = id,
-                Count = 1
+                Count = count ?? 1
             });
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");

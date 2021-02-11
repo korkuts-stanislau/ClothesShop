@@ -3,19 +3,10 @@
 @{ ViewData["Title"] = "Index";
     var defaultOrder = Model.Orders.FirstOrDefault(); }
 
-<h1>Index</h1>
 
-@if (User.IsInRole(ClothesShop.Areas.Identity.Roles.Admin))
-{
-<p>
-    <a asp-action="Create">Create New</a>
-</p>}
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => defaultOrder.UserId)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => defaultOrder.CustomerName)
             </th>
@@ -41,9 +32,6 @@
         @foreach (var item in Model.Orders)
         {
 <tr>
-    <td>
-        @Html.DisplayFor(modelItem => item.UserId)
-    </td>
     <td>
         @Html.DisplayFor(modelItem => item.CustomerName)
     </td>

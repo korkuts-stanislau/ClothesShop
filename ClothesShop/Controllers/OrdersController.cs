@@ -8,18 +8,21 @@ using Microsoft.EntityFrameworkCore;
 using ClothesShop.Data;
 using ClothesShop.Models;
 using ClothesShop.EntityServices;
+using Microsoft.AspNetCore.Identity;
 
 namespace ClothesShop.Controllers
 {
     public class OrdersController : Controller
     {
+        UserManager<IdentityUser> _userManager;
         private readonly ClothesShopContext _context;
         private readonly OrderService _service;
         private readonly int _pageSize;
 
-        public OrdersController(ClothesShopContext context)
+        public OrdersController(ClothesShopContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
             _service = new OrderService();
             _pageSize = 8;
         }
@@ -39,7 +42,14 @@ namespace ClothesShop.Controllers
             _service.SetDefaultValuesIfNull(ref page, ref sortState);
             _service.SetCookies(Response.Cookies, User.Identity.Name, page, sortState);
 
-            var orders = _context.Orders.AsQueryable();
+            var orders = _context.Orders
+                .AsQueryable();
+
+            if (User.IsInRole(Areas.Identity.Roles.User))
+            {
+                orders = orders
+                .Where(o => o.UserId.Equals(_userManager.GetUserId(User)));
+            }
 
             orders = _service.Filter(orders);
 
@@ -79,36 +89,6 @@ namespace ClothesShop.Controllers
             return View(order);
         }
 
-        // GET: Orders/Create
-        public IActionResult Create()
-        {
-            if (!User.IsInRole(Areas.Identity.Roles.Admin))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            return View();
-        }
-
-        // POST: Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,MyProperty,CustomerName,CustomerPhone,CustomerAddress,Date,IsPaid,IsSent,Id")] Order order)
-        {
-            if (!User.IsInRole(Areas.Identity.Roles.Admin))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            if (ModelState.IsValid)
-            {
-                _context.Add(order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(order);
-        }
-
         // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -134,7 +114,7 @@ namespace ClothesShop.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,MyProperty,CustomerName,CustomerPhone,CustomerAddress,Date,IsPaid,IsSent,Id")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("CustomerName,CustomerPhone,CustomerAddress,Date,IsPaid,IsSent,Id")] Order order)
         {
             if (!User.IsInRole(Areas.Identity.Roles.Admin))
             {
@@ -149,6 +129,7 @@ namespace ClothesShop.Controllers
             {
                 try
                 {
+                    order.UserId = _userManager.GetUserId(User);
                     _context.Update(order);
                     await _context.SaveChangesAsync();
                 }
