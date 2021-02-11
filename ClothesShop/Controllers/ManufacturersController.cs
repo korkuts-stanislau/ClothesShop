@@ -27,7 +27,7 @@ namespace ClothesShop.Controllers
         // GET: Manufacturers
         public async Task<IActionResult> Index(string selectedName, int? page, ManufacturerService.SortState? sortState)
         {
-            if (!User.IsInRole(Areas.Identity.Roles.User) && !User.IsInRole(Areas.Identity.Roles.Admin))
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
             {
                 return Redirect("~/Identity/Account/Login");
             }
@@ -63,6 +63,10 @@ namespace ClothesShop.Controllers
         // GET: Manufacturers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -81,6 +85,10 @@ namespace ClothesShop.Controllers
         // GET: Manufacturers/Create
         public IActionResult Create()
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             return View();
         }
 
@@ -91,6 +99,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,Id")] Manufacturer manufacturer)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(manufacturer);
@@ -103,6 +115,10 @@ namespace ClothesShop.Controllers
         // GET: Manufacturers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -123,6 +139,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Name,Description,Id")] Manufacturer manufacturer)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             if (id != manufacturer.Id)
             {
                 return NotFound();
@@ -154,6 +174,10 @@ namespace ClothesShop.Controllers
         // GET: Manufacturers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -174,6 +198,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             var manufacturer = await _context.Manufacturers.FindAsync(id);
             _context.Manufacturers.Remove(manufacturer);
             await _context.SaveChangesAsync();
