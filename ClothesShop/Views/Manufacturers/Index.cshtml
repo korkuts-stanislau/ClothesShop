@@ -25,22 +25,28 @@
                     @Html.DisplayNameFor(model => defaultManufacturer.Name)
                 </a>
             </th>
+            <th>
+                @Html.DisplayNameFor(model => defaultManufacturer.Description)
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Manufacturers)
         {
-<tr>
-    <td>
-        @Html.DisplayFor(modelItem => item.Name)
-    </td>
-    <td>
-        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-    </td>
-</tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark m-1">Details</a>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark m-1">Edit</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark m-1">Delete</a>
+            </td>
+        </tr>
 }
     </tbody>
 </table>

@@ -21,7 +21,7 @@ namespace ClothesShop.Controllers
         {
             _context = context;
             _service = new OrderService();
-            _pageSize = 5;
+            _pageSize = 8;
         }
 
         // GET: Orders
@@ -60,6 +60,10 @@ namespace ClothesShop.Controllers
         // GET: Orders/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.User) && !User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -78,6 +82,10 @@ namespace ClothesShop.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
@@ -88,6 +96,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,MyProperty,CustomerName,CustomerPhone,CustomerAddress,Date,IsPaid,IsSent,Id")] Order order)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(order);
@@ -100,6 +112,10 @@ namespace ClothesShop.Controllers
         // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -120,6 +136,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UserId,MyProperty,CustomerName,CustomerPhone,CustomerAddress,Date,IsPaid,IsSent,Id")] Order order)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (id != order.Id)
             {
                 return NotFound();
@@ -151,6 +171,10 @@ namespace ClothesShop.Controllers
         // GET: Orders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -171,6 +195,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             var order = await _context.Orders.FindAsync(id);
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();

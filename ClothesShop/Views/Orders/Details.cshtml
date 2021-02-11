@@ -55,6 +55,9 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (User.IsInRole(ClothesShop.Areas.Identity.Roles.Admin))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-dark m-1">Edit</a>
+    }
+    <a asp-action="Index" class="btn btn-outline-dark m-1">Back</a>
 </div>

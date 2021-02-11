@@ -21,7 +21,7 @@ namespace ClothesShop.Controllers
         {
             _context = context; 
             _service = new ManufacturerService();
-            _pageSize = 5;
+            _pageSize = 8;
         }
 
         // GET: Manufacturers

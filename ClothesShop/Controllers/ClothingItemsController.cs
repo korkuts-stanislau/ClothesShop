@@ -8,18 +8,21 @@ using Microsoft.EntityFrameworkCore;
 using ClothesShop.Data;
 using ClothesShop.Models;
 using ClothesShop.EntityServices;
+using Microsoft.AspNetCore.Identity;
 
 namespace ClothesShop.Controllers
 {
     public class ClothingItemsController : Controller
     {
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly ClothesShopContext _context;
         private readonly ClothingItemService _service;
         private readonly int _pageSize;
 
-        public ClothingItemsController(ClothesShopContext context)
+        public ClothingItemsController(ClothesShopContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
             _service = new ClothingItemService();
             _pageSize = 5;
         }
@@ -94,8 +97,8 @@ namespace ClothesShop.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Id");
-            ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Id");
+            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Name");
+            ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Name");
             return View();
         }
 
@@ -116,8 +119,8 @@ namespace ClothesShop.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Id", clothingItem.ManufacturerId);
-            ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Id", clothingItem.TypeId);
+            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Name", clothingItem.ManufacturerId);
+            ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Name", clothingItem.TypeId);
             return View(clothingItem);
         }
 
@@ -138,8 +141,8 @@ namespace ClothesShop.Controllers
             {
                 return NotFound();
             }
-            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Id", clothingItem.ManufacturerId);
-            ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Id", clothingItem.TypeId);
+            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Name", clothingItem.ManufacturerId);
+            ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Name", clothingItem.TypeId);
             return View(clothingItem);
         }
 
@@ -179,8 +182,8 @@ namespace ClothesShop.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Id", clothingItem.ManufacturerId);
-            ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Id", clothingItem.TypeId);
+            ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Name", clothingItem.ManufacturerId);
+            ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Name", clothingItem.TypeId);
             return View(clothingItem);
         }
 
@@ -222,6 +225,25 @@ namespace ClothesShop.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToBasket(int id)
+        {
+            if (!User.IsInRole(Areas.Identity.Roles.User))
+            {
+                return RedirectToAction("Index");
+            }
+            await _context.BasketItems.AddAsync(new BasketItem
+            {
+                UserId = _userManager.GetUserId(User),
+                ClothingItemId = id,
+                Count = 1
+            });
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
+
 
         private bool ClothingItemExists(int id)
         {

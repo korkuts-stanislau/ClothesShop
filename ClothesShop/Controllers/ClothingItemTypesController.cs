@@ -21,7 +21,7 @@ namespace ClothesShop.Controllers
         {
             _context = context;
             _service = new ClothingItemTypeService();
-            _pageSize = 5;
+            _pageSize = 6;
         }
 
         // GET: ClothingItemTypes
