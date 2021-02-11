@@ -19,21 +19,30 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ClothingItemTypes" asp-action="Index">Types</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Manufacturers" asp-action="Index">Manufacturers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ClothingItems" asp-action="Index">Clothing</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="BasketItems" asp-action="Index">Basket</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Index">Orders</a>
-                        </li>
+                        @if (User.IsInRole(ClothesShop.Areas.Identity.Roles.Admin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="ClothingItemTypes" asp-action="Index">Types</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Manufacturers" asp-action="Index">Manufacturers</a>
+                            </li>
+                        }
+                        @if (User.IsInRole(ClothesShop.Areas.Identity.Roles.User) || User.IsInRole(ClothesShop.Areas.Identity.Roles.Admin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="ClothingItems" asp-action="Index">Clothing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Index">Orders</a>
+                            </li>
+                        }
+                        @if (User.IsInRole(ClothesShop.Areas.Identity.Roles.User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="BasketItems" asp-action="Index">Basket</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

@@ -27,9 +27,13 @@ namespace ClothesShop.Controllers
         // GET: BasketItems
         public async Task<IActionResult> Index(string selectedName, int? page, BasketItemService.SortState? sortState)
         {
-            if (!User.IsInRole(Areas.Identity.Roles.User) && !User.IsInRole(Areas.Identity.Roles.Admin))
+            if (!User.IsInRole(Areas.Identity.Roles.User))
             {
-                return Redirect("~/Identity/Account/Login");
+                if(!User.IsInRole(Areas.Identity.Roles.Admin))
+                {
+                    return Redirect("~/Identity/Account/Login");
+                }
+                return RedirectToAction("Index", "Home");
             }
             bool isFromFilter = HttpContext.Request.Query["isFromFilter"] == "true";
 
@@ -65,6 +69,14 @@ namespace ClothesShop.Controllers
         // GET: BasketItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.User))
+            {
+                if (!User.IsInRole(Areas.Identity.Roles.Admin))
+                {
+                    return Redirect("~/Identity/Account/Login");
+                }
+                return RedirectToAction("Index", "Home");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -81,86 +93,17 @@ namespace ClothesShop.Controllers
             return View(basketItem);
         }
 
-        // GET: BasketItems/Create
-        public IActionResult Create()
-        {
-            ViewData["ClothingItemId"] = new SelectList(_context.ClothingItems, "Id", "Id");
-            return View();
-        }
-
-        // POST: BasketItems/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,ClothingItemId,Count,Id")] BasketItem basketItem)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(basketItem);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClothingItemId"] = new SelectList(_context.ClothingItems, "Id", "Id", basketItem.ClothingItemId);
-            return View(basketItem);
-        }
-
-        // GET: BasketItems/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var basketItem = await _context.BasketItems.FindAsync(id);
-            if (basketItem == null)
-            {
-                return NotFound();
-            }
-            ViewData["ClothingItemId"] = new SelectList(_context.ClothingItems, "Id", "Id", basketItem.ClothingItemId);
-            return View(basketItem);
-        }
-
-        // POST: BasketItems/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,ClothingItemId,Count,Id")] BasketItem basketItem)
-        {
-            if (id != basketItem.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(basketItem);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BasketItemExists(basketItem.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClothingItemId"] = new SelectList(_context.ClothingItems, "Id", "Id", basketItem.ClothingItemId);
-            return View(basketItem);
-        }
-
         // GET: BasketItems/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.User))
+            {
+                if (!User.IsInRole(Areas.Identity.Roles.Admin))
+                {
+                    return Redirect("~/Identity/Account/Login");
+                }
+                return RedirectToAction("Index", "Home");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -182,6 +125,14 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.User))
+            {
+                if (!User.IsInRole(Areas.Identity.Roles.Admin))
+                {
+                    return Redirect("~/Identity/Account/Login");
+                }
+                return RedirectToAction("Index", "Home");
+            }
             var basketItem = await _context.BasketItems.FindAsync(id);
             _context.BasketItems.Remove(basketItem);
             await _context.SaveChangesAsync();

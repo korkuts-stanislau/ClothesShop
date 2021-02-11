@@ -31,7 +31,6 @@ namespace ClothesShop.Areas.Identity
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(admin, Roles.Admin);
-                    await userManager.AddToRoleAsync(admin, Roles.User);
                 }
             }
         }
