@@ -5,9 +5,11 @@
 
 <h1>Index</h1>
 
+@if (User.IsInRole(ClothesShop.Areas.Identity.Roles.Admin))
+{
 <p>
     <a asp-action="Create">Create New</a>
-</p>
+</p>}
 <form method="get" class="form-inline">
     <label>Clothing item name:</label>
     <input name="selectedName" value="@Model.FilterClothingItemViewModel.SelectedName" class="form-control col-2 m-1" />
@@ -72,9 +74,13 @@
         @Html.DisplayFor(modelItem => item.Price)
     </td>
     <td>
-        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+        
+    @if(User.IsInRole(ClothesShop.Areas.Identity.Roles.Admin))
+    {
+        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+     }
+        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
     </td>
 </tr>}
     </tbody>

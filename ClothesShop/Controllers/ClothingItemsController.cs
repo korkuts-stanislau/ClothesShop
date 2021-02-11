@@ -66,6 +66,10 @@ namespace ClothesShop.Controllers
         // GET: ClothingItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.User) && !User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return Redirect("~/Identity/Account/Login");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -86,6 +90,10 @@ namespace ClothesShop.Controllers
         // GET: ClothingItems/Create
         public IActionResult Create()
         {
+            if(!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             ViewData["ManufacturerId"] = new SelectList(_context.Manufacturers, "Id", "Id");
             ViewData["TypeId"] = new SelectList(_context.ClothingItemTypes, "Id", "Id");
             return View();
@@ -98,6 +106,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TypeId,ManufacturerId,Name,Description,Size,IsMale,Price,Id")] ClothingItem clothingItem)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(clothingItem);
@@ -112,6 +124,10 @@ namespace ClothesShop.Controllers
         // GET: ClothingItems/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -134,6 +150,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TypeId,ManufacturerId,Name,Description,Size,IsMale,Price,Id")] ClothingItem clothingItem)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (id != clothingItem.Id)
             {
                 return NotFound();
@@ -167,6 +187,10 @@ namespace ClothesShop.Controllers
         // GET: ClothingItems/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (id == null)
             {
                 return NotFound();
@@ -189,6 +213,10 @@ namespace ClothesShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             var clothingItem = await _context.ClothingItems.FindAsync(id);
             _context.ClothingItems.Remove(clothingItem);
             await _context.SaveChangesAsync();
