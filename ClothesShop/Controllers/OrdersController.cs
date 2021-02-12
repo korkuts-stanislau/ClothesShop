@@ -9,6 +9,7 @@ using ClothesShop.Data;
 using ClothesShop.Models;
 using ClothesShop.EntityServices;
 using Microsoft.AspNetCore.Identity;
+using ClothesShop.ViewModels.Order;
 
 namespace ClothesShop.Controllers
 {
@@ -86,6 +87,57 @@ namespace ClothesShop.Controllers
                 return NotFound();
             }
 
+            var orderItems = _context.OrderClothingItems
+                .Where(o => o.OrderId == order.Id)
+                .Include(o => o.ClothingItem)
+                .Include(o => o.Order);
+
+            var model = new DetailsOrderViewModel
+            {
+                Order = order,
+                OrderClothingItems = orderItems.ToList()
+            };
+
+            return View(model);
+        }
+
+        // GET: Orders/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("CustomerName,CustomerPhone,CustomerAddress,Id")] Order order)
+        {
+            if (ModelState.IsValid)
+            {
+                order.UserId = _userManager.GetUserId(User);
+                order.Date = DateTime.Now;
+                order.IsPaid = false;
+                order.IsSent = false;
+                _context.Add(order);
+                _context.SaveChanges();
+
+                int orderToAddId = _context.Orders.Select(o => o.Id).AsEnumerable().LastOrDefault();
+
+                var basketItems = _context.BasketItems
+                    .Where(b => b.UserId == _userManager.GetUserId(User));
+                var orderItems = basketItems
+                    .Select(b => new OrderClothingItem
+                    {
+                        OrderId = orderToAddId,
+                        ClothingItemId = b.ClothingItemId,
+                        Count = b.Count
+                    });
+
+                _context.BasketItems.RemoveRange(basketItems);
+                _context.OrderClothingItems.AddRange(orderItems);
+
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Details), new { id = orderToAddId });
+            }
             return View(order);
         }
 
@@ -94,7 +146,7 @@ namespace ClothesShop.Controllers
         {
             if (!User.IsInRole(Areas.Identity.Roles.Admin))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Orders");
             }
             if (id == null)
             {
@@ -118,7 +170,7 @@ namespace ClothesShop.Controllers
         {
             if (!User.IsInRole(Areas.Identity.Roles.Admin))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Orders");
             }
             if (id != order.Id)
             {
@@ -154,7 +206,7 @@ namespace ClothesShop.Controllers
         {
             if (!User.IsInRole(Areas.Identity.Roles.Admin))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Orders");
             }
             if (id == null)
             {
@@ -178,12 +230,42 @@ namespace ClothesShop.Controllers
         {
             if (!User.IsInRole(Areas.Identity.Roles.Admin))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Orders");
             }
             var order = await _context.Orders.FindAsync(id);
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PayForOrder(int id)
+        {
+            if (!User.IsInRole(Areas.Identity.Roles.User))
+            {
+                return RedirectToAction("Index", "Orders");
+            }
+            var order = await _context.Orders.FindAsync(id);
+            order.IsPaid = true;
+            _context.Orders.Update(order);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Details), new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendOrder(int id)
+        {
+            if (!User.IsInRole(Areas.Identity.Roles.Admin))
+            {
+                return RedirectToAction("Index", "Orders");
+            }
+            var order = await _context.Orders.FindAsync(id);
+            order.IsSent = true;
+            _context.Orders.Update(order);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Details), new { id = id });
         }
 
         private bool OrderExists(int id)

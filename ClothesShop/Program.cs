@@ -22,9 +22,9 @@ namespace ClothesShop
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 await Areas.Identity.IdentityInitializer.InitializeAsync(userManager, roleManager);
 
-                var dbContext = scope.ServiceProvider.GetRequiredService<Data.ClothesShopContext>();
-                var dbInitializer = scope.ServiceProvider.GetRequiredService<Data.DbInitializer>();
-                await dbInitializer.Initialize(dbContext);
+                //var dbContext = scope.ServiceProvider.GetRequiredService<Data.ClothesShopContext>();
+                //var dbInitializer = scope.ServiceProvider.GetRequiredService<Data.DbInitializer>();
+                //await dbInitializer.Initialize(dbContext);
             }
             host.Run();
         }
